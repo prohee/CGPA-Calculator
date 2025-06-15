@@ -31,8 +31,10 @@ def calculate_cgpa(
     previous_credit: float = 0,
 ):
     total_credit = sum(credit) + previous_credit
-    total_grade = sum(grade_point * credit for grade_point, credit in zip(grade_points, credits)) + (previous_cgpa * previous_credit)
-    return total_grade / total_credit
+    total_grade_points = sum(
+        grade_point * credit for grade_point, credit in zip(grade_points, credits)
+    ) + (previous_cgpa * previous_credit)
+    return total_grade_points / total_credit
 
 
 st.title("CGPA Calculator")
@@ -42,6 +44,17 @@ st.markdown(
 )
 
 st.latex(r"CGPA = \frac{\sum_{i=1}^{n} (grade_i * credit_i)}{\sum_{i=1}^{n} credit_i}")
+with st.expander("Grade Table"):
+    st.markdown("""
+    | Marks  | Grade | Points |
+    | :----: | :---: | :----: |
+    | 90-100 | O     | 10     |
+    | 80-89  | A+    | 9      |
+    | 70-79  | A     | 8      |
+    | 60-69  | B+    | 7      |
+    | 50-59  | B     | 6      |
+    | 40-49  | C     | 5      |
+    """)
 
 cols = st.columns(2)
 previous_cgpa = cols[0].number_input(
@@ -51,13 +64,17 @@ previous_cgpa = cols[0].number_input(
     value=0.00,
     step=0.01,
 )
-previous_credit = cols[1].number_input(
-    label="Previous Credit",
-    help="Enter the total number of credits you have taken upto previous semester",
-    min_value=0.0,
-    value=0.0,
-    step=0.5,
-).__int__()
+previous_credit = (
+    cols[1]
+    .number_input(
+        label="Previous Credit",
+        help="Enter the total number of credits you have taken upto previous semester",
+        min_value=0.0,
+        value=0.0,
+        step=0.5,
+    )
+    .__int__()
+)
 number_of_subjects = st.number_input(
     label="Number of Subjects",
     help="Enter the number of subjects you are taking this semester",
@@ -69,17 +86,21 @@ number_of_subjects = st.number_input(
 grade = [grades[0]] * number_of_subjects
 credit = [0.0] * number_of_subjects
 for i in range(number_of_subjects):
-    st.subheader(f"Subject #{i+1}")
+    st.subheader(f"Subject #{i + 1}")
     cols = st.columns(2)
-    grade[i] = cols[0].selectbox(
-            label=f"Grade",
+    grade[i] = (
+        cols[0]
+        .selectbox(
+            label="Grade",
             options=grades,
             key=f"grade_{i}",
             index=0,
-        ).__str__()
+        )
+        .__str__()
+    )
 
     credit[i] = cols[1].number_input(
-        label=f"Credit",
+        label="Credit",
         min_value=1.0,
         max_value=10.0,
         value=4.0,
@@ -95,4 +116,4 @@ if st.button("Calculate"):
     )
 
 
-st.markdown("Made with ❤️ by [Siddhesh Agarwal](https://github.com/Siddhesh-Agarwal)")
+st.markdown("Made with ❤️ by [Siddhesh Agarwal](https://siddhesh.cc/)")
